@@ -6,8 +6,22 @@
 trigger:
 - master
 
+#pool:
+#  vmImage: ubuntu-latest
+#The above yaml allowed us to run this on only one platform
+#The below yaml allows us run on more than one, linux, mac and windows
+strategy:
+  matrix:
+    linux:
+      imageName: "ubuntu-latest"
+    mac:
+      imageName: "macOS-latest"
+    windows:
+      imageName: "windows-latest"
+  maxParallel: 3
+
 pool:
-  vmImage: ubuntu-latest
+  vmImage: $(imageName)
 
 steps:
 - script: echo Hello, world!
