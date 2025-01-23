@@ -6,35 +6,27 @@
 trigger:
 - master
 
-#pool:
-#  vmImage: ubuntu-latest
-#The above yaml allowed us to run this on only one platform
-#The below yaml allows us run on more than one, linux, mac and windows
 strategy:
   matrix:
-    linux:
+    jdk10_linux:
       imageName: "ubuntu-latest"
-    mac:
-      imageName: "macOS-latest"
-    windows:
+      jdkVersion: "1.10"
+    jdk11_windows:
       imageName: "windows-latest"
-  maxParallel: 3
+      jdkVersion: "1.11"
+  maxParallel: 2
 
 pool:
   vmImage: $(imageName)
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
-
-- task: PublishCodeCoverageResults@1
+- task: Maven@4
   inputs:
-    codeCoverageTool: "JaCoCo"
-    summaryFileLocation: "$(System.DefaultWorkingDirectory)/**/site/jacoco/jacoco.xml"
-    reportDirectory: "$(System.DefaultWorkingDirectory)/**/site/jacoco"
-    failIfCoverageEmpty: true
+    mavenPomFile: "pom.xml"
+    mavenOptions: "-Xmx3072m"
+    javaHomeOption: "JDKVersion"
+    jdkVersionOption: $(jdkVersion)
+    jdkArchitectureOption: "x64"
+    publishJUnitResults: true
+    testResultsFiles: "**/TEST-*.xml"
+    goals: "package"
